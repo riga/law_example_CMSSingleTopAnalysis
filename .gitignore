@@ -1,0 +1,7 @@
+*.sublime-project
+*.sublime-workspace
+*.pyc
+__pycache__
+*.log
+*.DS_Store
+build
