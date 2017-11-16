@@ -1,12 +1,9 @@
-law-ZBosonAnalysis
+SingleTop Analysis with Public CMS Data using luigi analysis workflows
 -
 
-Analysis of the Z boson with CMS 2011 public data using luigi analysis workflows.
-
-- https://github.com/riga/law
-- https://github.com/riga/OutreachExercise2011
-- http://opendata.cern.ch/research/CMS
-- http://luigi.readthedocs.io/en/stable/
+- [law](https://github.com/riga/law)
+- [luigi](http://luigi.readthedocs.io/en/stable)
+- [CMS Open Data](http://opendata.cern.ch/research/CMS)
 
 
 ## Authors
