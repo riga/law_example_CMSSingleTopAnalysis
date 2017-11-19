@@ -48,3 +48,5 @@ RUN pip install scikit-learn
 RUN pip install requests
 RUN pip install six
 RUN pip install luigi
+RUN pip install order
+RUN pip install scinum
