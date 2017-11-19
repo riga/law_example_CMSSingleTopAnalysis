@@ -86,7 +86,6 @@ class ShiftTask(ConfigTask):
     shifts = set()
 
     exclude_db = True
-
     exclude_params_db = {"effective_shift"}
     exclude_params_req = {"effective_shift"}
     exclude_params_sandbox = {"effective_shift"}
@@ -99,7 +98,7 @@ class ShiftTask(ConfigTask):
         # shift known to config?
         config_inst = od.Config(cls.config)
         if params["shift"] not in config_inst.shifts:
-            raise Exception("shift '%s' unknown to config %s" % (params["shift"], config_inst))
+            raise Exception("shift {} unknown to config {}".format(params["shift"], config_inst))
 
         # check if the shift is known to the task
         if params["shift"] in cls.shifts:
@@ -133,7 +132,7 @@ class DatasetTask(ShiftTask):
         # shift known to config?
         config_inst = od.Config.get_instance(cls.config)
         if params["shift"] not in config_inst.shifts:
-            raise Exception("shift '%s' unknown to config %s" % (params["shift"], config_inst))
+            raise Exception("shift {} unknown to config {}".format(params["shift"], config_inst))
 
         # check if the shift is known to the task or dataset
         dataset_inst = od.Dataset.get_instance(params["dataset"])

@@ -6,6 +6,7 @@ TODO.
 
 
 import law
+import six
 
 from analysis.framework.tasks import DatasetTask
 import analysis.setup.singleTop
@@ -21,8 +22,6 @@ class FetchData(DatasetTask):
 
     @law.decorator.log
     def run(self):
-        import six
-
         output = self.output()
         output.parent.touch()
 

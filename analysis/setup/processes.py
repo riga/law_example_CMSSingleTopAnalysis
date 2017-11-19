@@ -23,7 +23,7 @@ process_singleTop = od.Process("singleTop", 1000,
     label_short = "ST",
     color       = (67, 118, 201),
     xsecs       = {
-        7: sn.Number(5684. / 50, ("rel", 0.07))
+        7: sn.Number(5684. / 50, ("rel", 0.07)),
     },
 )
 
@@ -37,7 +37,7 @@ process_WJets = process_VJets.add_process("WJets", 2100,
     label       = r"W + Jets",
     label_short = "W",
     xsecs       = {
-        7: sn.Number(109737. / 50, ("rel", 0.05))
+        7: sn.Number(109737. / 50, ("rel", 0.05)),
     },
 )
 
@@ -45,7 +45,7 @@ process_ZJets = process_VJets.add_process("ZJets", 2200,
     label       = r"Z + Jets",
     label_short = "DY",
     xsecs       = {
-        7: sn.Number(77729. / 50, ("rel", 0.05))
+        7: sn.Number(77729. / 50, ("rel", 0.05)),
     },
 )
 
@@ -59,7 +59,7 @@ process_WWJets = process_VJets.add_process("WWJets", 3100,
     label       = r"WW + Jets",
     label_short = "WW",
     xsecs       = {
-        7: sn.Number(4580. / 50, ("rel", 0.04))
+        7: sn.Number(4580. / 50, ("rel", 0.04)),
     },
 )
 
@@ -67,7 +67,7 @@ process_WZJets = process_VJets.add_process("WZJets", 3200,
     label       = r"WZ + Jets",
     label_short = "WZ",
     xsecs       = {
-        7: sn.Number(3367. / 50, ("rel", 0.04))
+        7: sn.Number(3367. / 50, ("rel", 0.04)),
     },
 )
 
@@ -75,6 +75,6 @@ process_ZZJets = process_VJets.add_process("ZZJets", 3300,
     label       = r"ZZ + Jets",
     label_short = "ZZ",
     xsecs       = {
-        7: sn.Number(2421. / 50, ("rel", 0.04))
+        7: sn.Number(2421. / 50, ("rel", 0.04)),
     },
 )
