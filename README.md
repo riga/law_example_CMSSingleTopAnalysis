@@ -1,9 +1,16 @@
 SingleTop Analysis with Public CMS Data using luigi analysis workflows
 -
 
+This example using under development.
+
+
+## Resources
+
 - [law](https://github.com/riga/law)
 - [luigi](http://luigi.readthedocs.io/en/stable)
 - [CMS Open Data](http://opendata.cern.ch/research/CMS)
+- LHC / CMS resources:
+  - [Recorded luminosity](https://twiki.cern.ch/twiki/bin/view/CMSPublic/DataQuality#2011_Proton_Proton_Collisions)
 
 
 ## Authors
