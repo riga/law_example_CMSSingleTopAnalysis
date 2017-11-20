@@ -56,7 +56,8 @@ class AnalysisTask(law.SandboxTask):
 
     @property
     def default_log_file(self):
-        return self.local_path("log.txt")
+        # return self.local_path("log.txt")
+        return "-"
 
 
 class ConfigTask(AnalysisTask):

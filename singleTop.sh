@@ -5,7 +5,7 @@ action() {
 
 	# analysis variables
 	export ANALYSIS_BASE="$base"
-	export ANALYSIS_LOCAL_STORE="$ANALYSIS_BASE/data/singleTop"
+	export ANALYSIS_LOCAL_STORE="$ANALYSIS_BASE/data"
 	export LAW_CONFIG_FILE="$ANALYSIS_BASE/law.cfg"
 	export LUIGI_CONFIG_PATH="$ANALYSIS_BASE/luigi.cfg"
 }

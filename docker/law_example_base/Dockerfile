@@ -1,7 +1,7 @@
 FROM centos:7
 
 LABEL name="law_example_base"
-LABEL version="0.0.1"
+LABEL version="0.0.2"
 
 WORKDIR /root/law_example
 
@@ -34,7 +34,7 @@ RUN yum install -y gcc-gfortran openssl-devel pcre-devel mesa-libGL-devel mesa-l
 
 # root
 RUN cd /software && \
-    wget https://root.cern.ch/download/root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
+    wget -nv https://root.cern.ch/download/root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
     tar -xzf root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
     rm root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
     echo "source \$ROOTSYS/bin/thisroot.sh" >> /root/.bashrc
@@ -48,5 +48,5 @@ RUN pip install scikit-learn
 RUN pip install requests
 RUN pip install six
 RUN pip install luigi
-RUN pip install order
 RUN pip install scinum
+RUN pip install order
