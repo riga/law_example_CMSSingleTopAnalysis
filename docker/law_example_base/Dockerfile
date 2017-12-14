@@ -2,12 +2,13 @@ FROM centos:7
 
 # labels
 LABEL name="law_example_base"
-LABEL version="0.0.2"
+LABEL version="0.0.3"
 
 # workdor
 WORKDIR /root/law_example
 
 # basic environment variables
+ENV LAW_SANDBOX docker::riga/law_example_base
 ENV PATH /usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
 ENV LIBPATH /usr/local/lib:$LIBPATH
