@@ -1,0 +1,72 @@
+# -*- coding: utf-8 -*-
+
+"""
+Event selection.
+"""
+
+
+__all__ = ["select_singleTop"]
+
+
+from analysis.framework.opendata import *
+
+
+def select_singleTop(events):
+    indexes = []
+    objects = []
+
+    for idx, event in enumerate(events):
+        # trigger selection
+        if not event["triggerIsoMu24"]:
+            continue
+
+        # MET selection
+        met = load_met(event)
+        if met.Pt() <= 25:
+            continue
+
+        # electron selection
+        eles = []
+        veto_eles = []
+        for i in range(event["NElectron"]):
+            ele = load_electron(event, i)
+            if ele.Pt() > 20 and abs(ele.Eta()) < 2.1 and ele.Iso < 0.12:
+                eles.append(ele)
+            elif ele.Pt() > 10 and abs(ele.Eta()) < 2.4 and ele.Iso < 0.24:
+                veto_eles.append(ele)
+
+        # muon selection
+        mus = []
+        veto_mus = []
+        for i in range(event["NMuon"]):
+            mu = load_muon(event, i)
+            if mu.Pt() > 20 and abs(mu.Eta()) < 2.1 and mu.Iso < 0.12:
+                mus.append(mu)
+            elif mu.Pt() > 10 and abs(mu.Eta()) < 2.4 and mu.Iso < 0.24:
+                veto_mus.append(mu)
+
+        # overall lepton selection, we only focus on muons
+        if len(mus) != 1 or len(eles) + len(veto_eles) + len(veto_mus) > 0:
+            continue
+        mu = mus[0]
+
+        # jet selection
+        jets = []
+        for i in range(event["NJet"]):
+            jet = load_jet(event, i)
+            if jet.ID and jet.Pt() > 25 and abs(jet.Eta()) < 4.5:
+                jets.append(jet)
+        if len(jets) < 2:
+            continue
+        # sort by pt
+        jets.sort(key=lambda jet: -jet.Pt())
+
+        # btag selection (TCHP medium)
+        btagged_jets = filter(lambda jet: jet.btag > 1.93, jets)
+        if len(btagged_jets) < 1:
+            continue
+
+        indexes.append(idx)
+        objects.append((jets, btagged_jets, mu, met))
+
+    return indexes, objects

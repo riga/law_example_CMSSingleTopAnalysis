@@ -33,7 +33,7 @@ class AnalysisTask(law.SandboxTask):
         self.analysis_inst = od.Analysis.get_instance(self.analysis)
 
         # other attributes
-        self.local_root = self.env["ANALYSIS_LOCAL_STORE"]
+        self.local_root = os.environ["ANALYSIS_LOCAL_STORE"]
 
     @property
     def store_parts(self):
