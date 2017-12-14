@@ -21,8 +21,13 @@ def reconstruct_singleTop(events, selected_objects):
     reco_data = np.empty((len(events),), dtype=[(name, "<f4") for name in names])
 
     for event, objects, reco in six.moves.zip(events, selected_objects, reco_data):
-        jets, btagged_jets, mu, met = objects
-
-        reco["Jet1_Pt"] = jets[0].Pt()
+        reconstruct_event_singleTop(event, objects, reco)
 
     return reco_data
+
+
+def reconstruct_event_singleTop(event, selected_objects, reco_data):
+    jets, btagged_jets, mu, met = selected_objects
+
+    reco_data["Jet1_Pt"] = jets[0].Pt()
+    # TODO

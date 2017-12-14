@@ -49,4 +49,17 @@ cfg.add_shift("lumi_down", type="rate",  label="Luminosity")
 cfg.add_shift("jer_up",    type="shape", label="Jet energy resolution")
 cfg.add_shift("jer_down",  type="shape", label="Jet energy resolution")
 
-# auxiliary data
+# variables
+cfg.add_variable("jet1_pt",
+    expression = "Jet1_Pt",
+    binning    = (20, 0., 200.,),
+    unit       = "GeV",
+    x_title    = r"Leading jet $p_{T}$",
+)
+
+cfg.add_variable("weight",
+    expression = "EventWeight",
+    binning    = (20, 0., 1.,),
+    x_title    = "Event weight",
+    aux        = {"weight": False},
+)

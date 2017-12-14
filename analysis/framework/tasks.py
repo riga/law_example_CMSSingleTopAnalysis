@@ -137,7 +137,7 @@ class DatasetTask(ShiftTask):
 
         # check if the shift is known to the task or dataset
         dataset_inst = od.Dataset.get_instance(params["dataset"])
-        if params["shift"] in cls.shifts or params["shift"] in dataset_inst.name.info:
+        if params["shift"] in cls.shifts or params["shift"] in dataset_inst.info:
             params["effective_shift"] = params["shift"]
 
         return params

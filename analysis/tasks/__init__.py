@@ -5,12 +5,16 @@ TODO.
 """
 
 
+from collections import OrderedDict
+
 import law
 import six
 
 from analysis.framework.tasks import ConfigTask, DatasetTask
 from analysis.framework.selection import select_singleTop as select
 from analysis.framework.reconstruction import reconstruct_singleTop as reconstruct
+from analysis.framework.systematics import apply_jer
+from analysis.framework.plotting import stack_plot
 from analysis.framework.util import join_struct_arrays
 import analysis.setup.singleTop
 
@@ -51,13 +55,41 @@ class ConvertData(DatasetTask):
         output.dump(events=rnp.root2array(self.input().path))
 
 
-class SelectAndReconstruct(DatasetTask):
+class VaryJER(DatasetTask):
+
+    shifts = {"jer_up", "jer_down"}
 
     sandbox = "docker::riga/law_example_base"
     force_sandbox = True
 
     def requires(self):
         return ConvertData.req(self)
+
+    def output(self):
+        return law.LocalFileTarget(self.local_path("data.npz"))
+
+    @law.decorator.log
+    def run(self):
+        events = self.input().load()["events"]
+
+        # apply jer to all events
+        apply_jer(events, self.shift_inst.direction)
+
+        output = self.output()
+        output.parent.touch()
+        output.dump(events=events)
+
+
+class SelectAndReconstruct(DatasetTask):
+
+    shifts = VaryJER.shifts
+
+    sandbox = "docker::riga/law_example_base"
+    force_sandbox = True
+
+    def requires(self):
+        cls = ConvertData if self.shift_inst.is_nominal else VaryJER
+        return cls.req(self)
 
     def output(self):
         return law.LocalFileTarget(self.local_path("data.npz"))
@@ -83,11 +115,13 @@ class SelectAndReconstruct(DatasetTask):
 
 class CreateHistograms(ConfigTask):
 
-    sandbox = "docker::riga/law_example_base"
-    force_sandbox = True
+    shifts = VaryJER.shifts
+
+    # sandbox = "docker::riga/law_example_base"
+    # force_sandbox = True
 
     def requires(self):
-        reqs = {}
+        reqs = OrderedDict()
         for dataset in self.config_inst.datasets:
             reqs[dataset] = SelectAndReconstruct.req(self, dataset=dataset.name)
         return reqs
@@ -101,10 +135,19 @@ class CreateHistograms(ConfigTask):
         matplotlib.use("AGG")
         import matplotlib.pyplot as plt
 
-        # load input arrays per dataset
-        events = {}
+        # load input arrays per dataset, map them to the first linked process
+        events = OrderedDict()
         for dataset, inp in self.input().items():
-            self.publish_message("loading events for dataset {}".format(dataset.name))
-            events[dataset] = inp.load()["events"]
+            process = list(dataset.processes.values())[0]
+            events[process] = inp.load()["events"]
+            self.publish_message("loaded events for dataset {}".format(dataset.name))
 
-        pass
+        tmp = law.LocalDirectoryTarget(is_tmp=True)
+        tmp.touch()
+
+        for variable in self.config_inst.variables:
+            stack_plot(events, variable, tmp.child(variable.name + ".pdf", "f").path)
+
+        output = self.output()
+        output.parent.touch()
+        output.dump(tmp)
