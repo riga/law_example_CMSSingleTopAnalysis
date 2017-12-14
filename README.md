@@ -1,7 +1,7 @@
 SingleTop Analysis with Public CMS Data using luigi analysis workflows
 -
 
-This example using under development.
+*This project is under development*
 
 
 ## Resources
