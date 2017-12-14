@@ -1,16 +1,11 @@
 FROM centos:7
 
+# labels
 LABEL name="law_example_base"
 LABEL version="0.0.2"
 
+# workdor
 WORKDIR /root/law_example
-
-
-#
-# setup software and environment
-#
-
-RUN mkdir /software
 
 # basic environment variables
 ENV PATH /usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
@@ -21,9 +16,11 @@ ENV PKG_CONFIG_PATH /usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 ENV CMAKE_MODULE_PATH /usr/local/etc/cmake
 ENV MANPATH /usr/local/man
 
-# main software
+# prepare yum
 RUN yum -y update; yum clean all
 RUN yum -y install yum-plugin-priorities; yum clean all
+
+# basic software
 RUN yum install -y epel-release; yum clean all
 RUN yum groupinstall -y "Development Tools"; yum clean all
 RUN yum install -y gcc-gfortran openssl-devel pcre-devel mesa-libGL-devel mesa-libGLU-devel \
@@ -32,19 +29,25 @@ RUN yum install -y gcc-gfortran openssl-devel pcre-devel mesa-libGL-devel mesa-l
     curl-devel json-c-devel git make cmake binutils swig nano htop which screen wget python-devel \
     python-pip; yum clean all
 
+# additional software
+RUN mkdir /software
+
 # root
+ENV ROOTSYS /software/root
 RUN cd /software && \
     wget -nv https://root.cern.ch/download/root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
     tar -xzf root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
     rm root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
-    echo "source \$ROOTSYS/bin/thisroot.sh" >> /root/.bashrc
-ENV ROOTSYS /software/root
+    echo "source \$ROOTSYS/bin/thisroot.sh" >> /etc/profile.d/software.sh
 
 # python packages
 RUN pip install numpy
 RUN pip install scipy
 RUN pip install matplotlib
+RUN pip install numexpr
+RUN pip install pandas
 RUN pip install scikit-learn
+RUN pip install root_numpy
 RUN pip install requests
 RUN pip install six
 RUN pip install luigi
