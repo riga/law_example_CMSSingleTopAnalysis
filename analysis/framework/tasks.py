@@ -162,3 +162,6 @@ class DatasetTask(ShiftTask):
         # insert the dataset name right before the shift
         parts = parts[:-1] + (self.dataset, parts[-1])
         return parts
+
+    def create_branch_map(self):
+        return {i: i for i in range(self.dataset_info_inst.n_files)}
