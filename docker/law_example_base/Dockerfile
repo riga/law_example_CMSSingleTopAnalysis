@@ -2,7 +2,7 @@ FROM centos:7
 
 # labels
 LABEL name="law_example_base"
-LABEL version="0.0.3"
+LABEL version="0.0.5"
 
 # workdor
 WORKDIR /root/law_example
@@ -28,10 +28,17 @@ RUN yum install -y gcc-gfortran openssl-devel pcre-devel mesa-libGL-devel mesa-l
     glew-devel ftgl-devel fftw-devel cfitsio-devel libxml2-devel libldap-dev libpng-devel \
     avahi-compat-libdns_sd-devel gsl-static gcc-c++ gcc atlas atlas-devel lapack-devel blas-devel \
     curl-devel json-c-devel git make cmake binutils swig nano htop which screen wget python-devel \
-    python-pip; yum clean all
+    python-pip gfal2-all gfal2-devel gfal2-python; yum clean all
 
 # additional software
 RUN mkdir /software
+
+# gfal2 dropbox plugin
+RUN git clone https://github.com/cern-it-sdc-id/gfal2-dropbox.git && \
+    cd gfal2-dropbox && \
+    mkdir build && cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr && make && make install && \
+    cd ../.. && rm -rf gfal2-dropbox
 
 # root
 ENV ROOTSYS /software/root
@@ -42,15 +49,6 @@ RUN cd /software && \
     echo "source \$ROOTSYS/bin/thisroot.sh" >> /etc/profile.d/software.sh
 
 # python packages
-RUN pip install numpy
-RUN pip install scipy
-RUN pip install matplotlib
-RUN pip install numexpr
-RUN pip install pandas
-RUN pip install scikit-learn
-RUN pip install root_numpy
 RUN pip install requests
 RUN pip install six
 RUN pip install luigi
-RUN pip install scinum
-RUN pip install order

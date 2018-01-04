@@ -4,7 +4,7 @@
 Single top analysis definition including config for 2011 Open Data @ 7 TeV.
 """
 
-__all__ = ["analysis_singleTop", "config_singleTop_opendata_2011"]
+__all__ = ["analysis_singletop", "config_singletop_opendata_2011"]
 
 
 import order as od
@@ -16,15 +16,15 @@ from analysis.setup.opendata_2011 import campaign_opendata_2011
 # define analysis
 # 
 
-analysis_singleTop = ana = od.Analysis("singleTop", 1)
+analysis_singletop = ana = od.Analysis("singletop", 1)
 
 
 #
 # config for 2011 Open Data @ 7 TeV
 #
 
-config_singleTop_opendata_2011 = cfg = ana.add_config(campaign_opendata_2011,
-    name = "singleTop_opendata_2011"
+config_singletop_opendata_2011 = cfg = ana.add_config(campaign_opendata_2011,
+    name = "singletop_opendata_2011"
 )
 
 # add datasets and processes we're interested in

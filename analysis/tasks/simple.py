@@ -15,12 +15,12 @@ import law
 import six
 
 from analysis.framework.tasks import ConfigTask, DatasetTask
-from analysis.framework.selection import select_singleTop as select
-from analysis.framework.reconstruction import reconstruct_singleTop as reconstruct
+from analysis.framework.selection import select_singletop as select
+from analysis.framework.reconstruction import reconstruct_singletop as reconstruct
 from analysis.framework.systematics import apply_jer
 from analysis.framework.plotting import stack_plot
 from analysis.framework.util import join_struct_arrays
-import analysis.setup.singleTop
+import analysis.setup.singletop
 
 
 class FetchData(DatasetTask):
@@ -40,7 +40,7 @@ class FetchData(DatasetTask):
 
 class ConvertData(DatasetTask):
 
-    sandbox = "docker::riga/law_example_base"
+    sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
     def requires(self):
@@ -59,12 +59,14 @@ class ConvertData(DatasetTask):
         output.parent.touch()
         output.dump(events=events)
 
+        self.publish_message("converted {} events".format(len(events)))
+
 
 class VaryJER(DatasetTask):
 
     shifts = {"jer_up", "jer_down"}
 
-    sandbox = "docker::riga/law_example_base"
+    sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
     def requires(self):
@@ -89,7 +91,7 @@ class SelectAndReconstruct(DatasetTask):
 
     shifts = VaryJER.shifts
 
-    sandbox = "docker::riga/law_example_base"
+    sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
     def requires(self):
@@ -121,7 +123,7 @@ class CreateHistograms(ConfigTask):
 
     shifts = VaryJER.shifts
 
-    sandbox = "docker::riga/law_example_base"
+    sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
     def requires(self):
@@ -151,7 +153,36 @@ class CreateHistograms(ConfigTask):
 
         for variable in self.config_inst.variables:
             stack_plot(events, variable, tmp.child(variable.name + ".pdf", "f").path)
+            self.publish_message("written histogram for variable {}".format(variable.name))
 
         output = self.output()
         output.parent.touch()
         output.dump(tmp)
+
+
+class PublishHistograms(ConfigTask):
+
+    shifts = CreateHistograms.shifts
+
+    sandbox = "docker::riga/law_example_singletop"
+    force_sandbox = True
+
+    def requires(self):
+        return CreateHistograms.req(self)
+
+    def output(self):
+        targets = {}
+        for variable in self.config_inst.variables:
+            targets[variable] = law.DropboxFileTarget(self.remote_path(variable.name + ".pdf"))
+        return law.SiblingFileCollection(targets)
+
+    @law.decorator.log
+    def run(self):
+        tmp_dir = law.LocalDirectoryTarget(is_tmp=True)
+        self.input().load(tmp_dir)
+
+        output = self.output()
+        output.dir.touch()
+
+        for variable, outp in output.targets.items():
+            outp.copy_from_local(tmp_dir.child(outp.basename))

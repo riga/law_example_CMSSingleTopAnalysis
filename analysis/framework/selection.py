@@ -5,18 +5,18 @@ Event selection.
 """
 
 
-__all__ = ["select_singleTop"]
+__all__ = ["select_singletop"]
 
 
 from analysis.framework.opendata import *
 
 
-def select_singleTop(events):
+def select_singletop(events):
     indexes = []
     objects = []
 
     for idx, event in enumerate(events):
-        objs = select_event_singleTop(event)
+        objs = select_event_singletop(event)
         if objs:
             indexes.append(idx)
             objects.append(objs)
@@ -24,7 +24,7 @@ def select_singleTop(events):
     return indexes, objects
 
 
-def select_event_singleTop(event):
+def select_event_singletop(event):
     # trigger selection
     if not event["triggerIsoMu24"]:
         return False

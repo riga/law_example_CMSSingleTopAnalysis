@@ -18,7 +18,7 @@ class AnalysisTask(law.SandboxTask):
 
     version = luigi.Parameter(description="task version, required")
 
-    analysis = "singleTop"
+    analysis = "singletop"
 
     exclude_db = True
 
@@ -37,7 +37,7 @@ class AnalysisTask(law.SandboxTask):
 
     @property
     def store_parts(self):
-        return (self.__class__.__name__,)
+        return (self.analysis, self.__class__.__name__)
 
     @property
     def store_parts_opt(self):
@@ -55,6 +55,14 @@ class AnalysisTask(law.SandboxTask):
         return os.path.join(self.local_store, *[str(part) for part in parts])
 
     @property
+    def remote_store(self):
+        parts = ("law_analysis",) + self.store_parts + self.store_parts_opt
+        return os.path.join(*parts)
+
+    def remote_path(self, *parts):
+        return os.path.join(self.remote_store, *[str(part) for part in parts])
+
+    @property
     def default_log_file(self):
         # return self.local_path("log.txt")
         return "-"
@@ -62,7 +70,7 @@ class AnalysisTask(law.SandboxTask):
 
 class ConfigTask(AnalysisTask):
 
-    config = "singleTop_opendata_2011"
+    config = "singletop_opendata_2011"
 
     exclude_db = True
 
