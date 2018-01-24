@@ -17,7 +17,7 @@ import six
 from analysis.framework.tasks import ConfigTask, DatasetTask
 from analysis.framework.selection import select_singletop as select
 from analysis.framework.reconstruction import reconstruct_singletop as reconstruct
-from analysis.framework.systematics import apply_jer
+from analysis.framework.systematics import vary_jer
 from analysis.framework.plotting import stack_plot
 from analysis.framework.util import join_struct_arrays
 import analysis.setup.singletop
@@ -79,8 +79,8 @@ class VaryJER(DatasetTask):
     def run(self):
         events = self.input().load()["events"]
 
-        # apply jer to all events
-        apply_jer(events, self.shift_inst.direction)
+        # vary jer in all events
+        vary_jer(events, self.shift_inst.direction)
 
         output = self.output()
         output.parent.touch()
@@ -158,31 +158,3 @@ class CreateHistograms(ConfigTask):
         output = self.output()
         output.parent.touch()
         output.dump(tmp)
-
-
-class PublishHistograms(ConfigTask):
-
-    shifts = CreateHistograms.shifts
-
-    sandbox = "docker::riga/law_example_singletop"
-    force_sandbox = True
-
-    def requires(self):
-        return CreateHistograms.req(self)
-
-    def output(self):
-        targets = {}
-        for variable in self.config_inst.variables:
-            targets[variable] = law.DropboxFileTarget(self.remote_path(variable.name + ".pdf"))
-        return law.SiblingFileCollection(targets)
-
-    @law.decorator.log
-    def run(self):
-        tmp_dir = law.LocalDirectoryTarget(is_tmp=True)
-        self.input().load(tmp_dir)
-
-        output = self.output()
-        output.dir.touch()
-
-        for variable, outp in output.targets.items():
-            outp.copy_from_local(tmp_dir.child(outp.basename))

@@ -4,18 +4,34 @@ action() {
 	local base="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && /bin/pwd )"
 	local parent="$( dirname "$base" )"
 
-	# update variables
-	export PYTHONPATH="$base:$PYTHONPATH"
+	_addpy() {
+		[ ! -z "$1" ] && export PYTHONPATH="$1:$PYTHONPATH"
+	}
 
-	# source development projects in parent directory
-	for p in law order scinum; do
-		if [ -d "$parent/$p" ]; then
-			if [ -f "$parent/$p/devenv.sh" ]; then
-				source "$parent/$p/devenv.sh"
-			else
-				export PYTHONPATH="$parent/$p:$PYTHONPATH"
-			fi
-		fi
-	done
+	_addbin() {
+		[ ! -z "$1" ] && export PATH="$1:$PATH"
+	}
+
+	# source dev software
+	export LAW_DEV_SOFTWARE="$base/devsoftware"
+	if [ -d "$LAW_DEV_SOFTWARE" ]; then
+		# luigi
+		_addpy "$LAW_DEV_SOFTWARE/luigi"
+		_addbin "$LAW_DEV_SOFTWARE/luigi/bin"
+
+		# six
+		_addpy "$LAW_DEV_SOFTWARE/six"
+
+		# law
+		_addpy "$LAW_DEV_SOFTWARE/law"
+		_addbin "$LAW_DEV_SOFTWARE/law/bin"
+		source "$( law completion )"
+
+		# order
+		_addpy "$LAW_DEV_SOFTWARE/order"
+	fi
+
+	# add _this_ repo
+	_addpy "$base"
 }
-action
+action "$@"

@@ -5,7 +5,7 @@ Functions that apply systematic uncertainties.
 """
 
 
-__all__ = ["apply_jer"]
+__all__ = ["vary_jer"]
 
 
 from random import gauss
@@ -13,12 +13,12 @@ from random import gauss
 from analysis.framework.opendata import *
 
 
-def apply_jer(events, direction):
+def vary_jer(events, direction):
     for event in events:
-        apply_event_jer(event, direction)
+        vary_event_jer(event, direction)
 
 
-def apply_event_jer(event, direction):
+def vary_event_jer(event, direction):
     for i in range(event["NJet"]):
         jet = load_jet(event, i)
 

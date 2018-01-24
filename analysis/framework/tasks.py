@@ -54,6 +54,9 @@ class AnalysisTask(law.SandboxTask):
     def local_path(self, *parts):
         return os.path.join(self.local_store, *[str(part) for part in parts])
 
+    def local_target(self, *parts):
+        return law.LocalFileTarget(self.local_path(*parts))
+
     @property
     def remote_store(self):
         parts = ("law_analysis",) + self.store_parts + self.store_parts_opt
