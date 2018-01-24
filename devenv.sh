@@ -22,13 +22,16 @@ action() {
 		# six
 		_addpy "$LAW_DEV_SOFTWARE/six"
 
+		# scinum
+		_addpy "$LAW_DEV_SOFTWARE/scinum"
+
+		# order
+		_addpy "$LAW_DEV_SOFTWARE/order"
+
 		# law
 		_addpy "$LAW_DEV_SOFTWARE/law"
 		_addbin "$LAW_DEV_SOFTWARE/law/bin"
 		source "$( law completion )"
-
-		# order
-		_addpy "$LAW_DEV_SOFTWARE/order"
 	fi
 
 	# add _this_ repo

@@ -31,10 +31,13 @@ action() {
 	# six
 	_install_git "six" "https://github.com/benjaminp/six.git" "1.11.0" || return "$?"
 
-	# law
-	_install_git "law" "https://github.com/riga/law.git" || return "$?"
+	# scinum
+	_install_git "scinum" "https://github.com/riga/scinum.git" || return "$?"
 
 	# order
 	_install_git "order" "https://github.com/riga/order.git" || return "$?"
+
+	# law
+	_install_git "law" "https://github.com/riga/law.git" || return "$?"
 }
 action "$@"
