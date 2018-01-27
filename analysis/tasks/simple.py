@@ -105,12 +105,14 @@ class SelectAndReconstruct(DatasetTask):
         events = self.input().load()["events"]
 
         # selection
-        indexes, selected_objects = select(events)
+        callback = self.create_progress_callback(len(events), (0, 50))
+        indexes, selected_objects = select(events, callback=callback)
         self.publish_message("selected {} of {} events".format(len(indexes), len(events)))
         events = events[indexes]
 
         # reconstruction
-        reco_data = reconstruct(events, selected_objects)
+        callback = self.create_progress_callback(len(events), (50, 100))
+        reco_data = reconstruct(events, selected_objects, callback=callback)
         self.publish_message("reconstructed {} variables".format(len(reco_data.dtype.names)))
         events = join_struct_arrays(events, reco_data)
 
@@ -137,10 +139,6 @@ class CreateHistograms(ConfigTask):
 
     @law.decorator.log
     def run(self):
-        import matplotlib
-        matplotlib.use("AGG")
-        import matplotlib.pyplot as plt
-
         # load input arrays per dataset, map them to the first linked process
         events = OrderedDict()
         for dataset, inp in self.input().items():

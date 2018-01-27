@@ -11,15 +11,19 @@ __all__ = ["select_singletop"]
 from analysis.framework.opendata import *
 
 
-def select_singletop(events):
+def select_singletop(events, callback=None):
     indexes = []
     objects = []
 
-    for idx, event in enumerate(events):
+    cb = callable(callback)
+
+    for i, event in enumerate(events):
         objs = select_event_singletop(event)
         if objs:
-            indexes.append(idx)
+            indexes.append(i)
             objects.append(objs)
+        if cb:
+            callback(i)
 
     return indexes, objects
 

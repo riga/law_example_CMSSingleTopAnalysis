@@ -76,8 +76,6 @@ class MapData(DatasetTask, law.LocalWorkflow):
 
     @law.decorator.log
     def run(self):
-        import numpy as np
-
         events = self.input().load()["events"]
 
         # "map" events into chunks
@@ -196,10 +194,6 @@ class CreateHistograms(ConfigTask):
 
     @law.decorator.log
     def run(self):
-        import matplotlib
-        matplotlib.use("AGG")
-        import matplotlib.pyplot as plt
-
         # load input arrays per dataset, map them to the first linked process
         events = OrderedDict()
         for dataset, inp in self.input().items():

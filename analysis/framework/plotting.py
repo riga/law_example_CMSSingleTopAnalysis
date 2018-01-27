@@ -8,9 +8,6 @@ Plotting.
 __all__ = ["stack_plot"]
 
 
-import os
-
-
 def stack_plot(events, variable, path, weight="EventWeight"):
     import matplotlib
     matplotlib.use("AGG")
