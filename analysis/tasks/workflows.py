@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Branched task chain that fetches public data, converts them to structured numpy arrays, splits them
-to achieve a map-reduce-like workflow, applies a simple selection and event reconstruction,
-"reduces" them again into a single file per dataset, and outputs some simple histograms.
+Task chain using workflows that fetches public data, converts them to structured numpy arrays,
+splits them to achieve a map-reduce-like workflow, applies a simple selection and event
+reconstruction, "reduces" them again into a single file per dataset, and outputs some simple
+histograms.
 
 Each chunk of a public data file is treated as a branch of a workflow allowing for higher
 concurrency during task processing. For a more simple, straight-forward task chain, see simple.py.
@@ -27,16 +28,14 @@ import analysis.setup.singletop
 class FetchData(DatasetTask):
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data.root"))
+        return self.local_target("data.root")
 
     @law.decorator.log
     def run(self):
-        output = self.output()
-        output.parent.touch()
-
-        # fetch the input file
-        src = self.dataset_info_inst.keys[0]
-        six.moves.urllib.request.urlretrieve(src, output.path)
+        with self.output().localize("w") as tmp:
+            # fetch the input file
+            src = self.dataset_info_inst.keys[0]
+            six.moves.urllib.request.urlretrieve(src, tmp.path)
 
 
 class ConvertData(DatasetTask):
@@ -48,17 +47,15 @@ class ConvertData(DatasetTask):
         return FetchData.req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data.npz"))
+        return self.local_target("data.npz")
 
     @law.decorator.log
     def run(self):
-        import root_numpy as rnp
+        # load via the root_numpy formatter which converts root trees into numpy arrays
+        events = self.input().load(formatter="root_numpy")
 
-        events = rnp.root2array(self.input().path)
-
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=events)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=events)
 
         self.publish_message("converted {} events".format(len(events)))
 
@@ -68,24 +65,28 @@ class MapData(DatasetTask, law.LocalWorkflow):
     sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
+    def workflow_requires(self):
+        reqs = super(MapData, self).workflow_requires()
+        reqs["data"] = self.requires_from_branch()
+        return reqs
+
     def requires(self):
         return ConvertData.req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data_{}.npz".format(self.branch)))
+        return self.local_target("data_{}.npz".format(self.branch))
 
     @law.decorator.log
     def run(self):
         events = self.input().load()["events"]
 
-        # "map" events into chunks
+        # "map" events into chunks, use the numer of files stored in the dataset instance
         slices = partial_slices(events.shape[0], self.dataset_info_inst.n_files)
         start, end = slices[self.branch]
         chunk = events[start:end]
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=chunk)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=chunk)
 
 
 class VaryJER(DatasetTask, law.LocalWorkflow):
@@ -95,11 +96,16 @@ class VaryJER(DatasetTask, law.LocalWorkflow):
     sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
+    def workflow_requires(self):
+        reqs = super(VaryJER, self).workflow_requires()
+        reqs["data"] = self.requires_from_branch()
+        return reqs
+
     def requires(self):
         return MapData.req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data_{}.npz".format(self.branch)))
+        return self.local_target("data_{}.npz".format(self.branch))
 
     @law.decorator.log
     def run(self):
@@ -108,9 +114,8 @@ class VaryJER(DatasetTask, law.LocalWorkflow):
         # vary jer in all events
         vary_jer(events, self.shift_inst.direction)
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=events)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=events)
 
 
 class SelectAndReconstruct(DatasetTask, law.LocalWorkflow):
@@ -120,11 +125,16 @@ class SelectAndReconstruct(DatasetTask, law.LocalWorkflow):
     sandbox = "docker::riga/law_example_singletop"
     force_sandbox = True
 
+    def workflow_requires(self):
+        reqs = super(SelectAndReconstruct, self).workflow_requires()
+        reqs["data"] = self.requires_from_branch()
+        return reqs
+
     def requires(self):
         return (MapData if self.shift_inst.is_nominal else VaryJER).req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data_{}.npz".format(self.branch)))
+        return self.local_target("data_{}.npz".format(self.branch))
 
     @law.decorator.log
     def run(self):
@@ -140,9 +150,8 @@ class SelectAndReconstruct(DatasetTask, law.LocalWorkflow):
         self.publish_message("reconstructed {} variables".format(len(reco_data.dtype.names)))
         events = join_struct_arrays(events, reco_data)
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=events)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=events)
 
 
 class ReduceData(DatasetTask):
@@ -156,7 +165,7 @@ class ReduceData(DatasetTask):
         return SelectAndReconstruct.req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data.npz"))
+        return self.local_target("data.npz")
 
     @law.decorator.log
     def run(self):
@@ -166,14 +175,10 @@ class ReduceData(DatasetTask):
         events = None
         for inp in self.input()["collection"].targets.values():
             chunk = inp.load()["events"]
-            if events is None:
-                events = chunk
-            else:
-                events = np.concatenate([events, chunk])
+            events = np.concatenate([events, chunk]) if events is not None else chunk
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=events)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=events)
 
 
 class CreateHistograms(ConfigTask):
@@ -201,13 +206,12 @@ class CreateHistograms(ConfigTask):
             events[process] = inp.load()["events"]
             self.publish_message("loaded events for dataset {}".format(dataset.name))
 
-        tmp = law.LocalDirectoryTarget(is_tmp=True)
-        tmp.touch()
+        tmp_dir = law.LocalDirectoryTarget(is_tmp=True)
+        tmp_dir.touch()
 
         for variable in self.config_inst.variables:
-            stack_plot(events, variable, tmp.child(variable.name + ".pdf", "f").path)
+            stack_plot(events, variable, tmp_dir.child(variable.name + ".pdf", "f").path)
             self.publish_message("written histogram for variable {}".format(variable.name))
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(tmp)
+        with self.output().localize("w") as tmp:
+            tmp.dump(tmp_dir)

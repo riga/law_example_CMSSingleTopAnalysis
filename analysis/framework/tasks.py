@@ -20,6 +20,7 @@ class AnalysisTask(law.SandboxTask):
 
     analysis = "singletop"
 
+    local_workflow_require_branches = True
     exclude_db = True
 
     @classmethod
@@ -33,7 +34,7 @@ class AnalysisTask(law.SandboxTask):
         self.analysis_inst = od.Analysis.get_instance(self.analysis)
 
         # other attributes
-        self.local_root = os.environ["ANALYSIS_LOCAL_STORE"]
+        self.local_root = os.getenv("ANALYSIS_LOCAL_STORE")
 
     @property
     def store_parts(self):
@@ -42,7 +43,7 @@ class AnalysisTask(law.SandboxTask):
     @property
     def store_parts_opt(self):
         parts = tuple()
-        if self.version != law.parameter.NO_STR:
+        if not law.is_no_param(self.version):
             parts += (self.version,)
         return parts
 
@@ -64,11 +65,6 @@ class AnalysisTask(law.SandboxTask):
 
     def remote_path(self, *parts):
         return os.path.join(self.remote_store, *[str(part) for part in parts])
-
-    @property
-    def default_log_file(self):
-        # return self.local_path("log.txt")
-        return "-"
 
 
 class ConfigTask(AnalysisTask):
@@ -175,4 +171,5 @@ class DatasetTask(ShiftTask):
         return parts
 
     def create_branch_map(self):
+        # trivial branch map: loop over file indexes
         return {i: i for i in range(self.dataset_info_inst.n_files)}

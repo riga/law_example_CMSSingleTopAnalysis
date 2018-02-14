@@ -28,6 +28,7 @@ def load_value(event, field, i=-1, default=0.):
 
     return value
 
+
 def dump_value(event, field, value, i=-1):
     if i >= 0:
         event[field][i] = value

@@ -26,16 +26,14 @@ import analysis.setup.singletop
 class FetchData(DatasetTask):
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data.root"))
+        return self.local_target("data.root")
 
     @law.decorator.log
     def run(self):
-        output = self.output()
-        output.parent.touch()
-
-        # fetch the input file
-        src = self.dataset_info_inst.keys[0]
-        six.moves.urllib.request.urlretrieve(src, output.path)
+        with self.output().localize("w") as tmp:
+            # fetch the input file
+            src = self.dataset_info_inst.keys[0]
+            six.moves.urllib.request.urlretrieve(src, tmp.path)
 
 
 class ConvertData(DatasetTask):
@@ -47,17 +45,15 @@ class ConvertData(DatasetTask):
         return FetchData.req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data.npz"))
+        return self.local_target("data.npz")
 
     @law.decorator.log
     def run(self):
-        import root_numpy as rnp
+        # load via the root_numpy formatter which converts root trees into numpy arrays
+        events = self.input().load(formatter="root_numpy")
 
-        events = rnp.root2array(self.input().path)
-
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=events)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=events)
 
         self.publish_message("converted {} events".format(len(events)))
 
@@ -98,7 +94,7 @@ class SelectAndReconstruct(DatasetTask):
         return (ConvertData if self.shift_inst.is_nominal else VaryJER).req(self)
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("data.npz"))
+        return self.local_target("data.npz")
 
     @law.decorator.log
     def run(self):
@@ -116,9 +112,8 @@ class SelectAndReconstruct(DatasetTask):
         self.publish_message("reconstructed {} variables".format(len(reco_data.dtype.names)))
         events = join_struct_arrays(events, reco_data)
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(events=events)
+        with self.output().localize("w") as tmp:
+            tmp.dump(events=events)
 
 
 class CreateHistograms(ConfigTask):
@@ -135,7 +130,7 @@ class CreateHistograms(ConfigTask):
         return reqs
 
     def output(self):
-        return law.LocalFileTarget(self.local_path("hists.tgz"))
+        return self.local_target("hists.tgz")
 
     @law.decorator.log
     def run(self):
@@ -146,13 +141,12 @@ class CreateHistograms(ConfigTask):
             events[process] = inp.load()["events"]
             self.publish_message("loaded events for dataset {}".format(dataset.name))
 
-        tmp = law.LocalDirectoryTarget(is_tmp=True)
-        tmp.touch()
+        tmp_dir = law.LocalDirectoryTarget(is_tmp=True)
+        tmp_dir.touch()
 
         for variable in self.config_inst.variables:
-            stack_plot(events, variable, tmp.child(variable.name + ".pdf", "f").path)
+            stack_plot(events, variable, tmp_dir.child(variable.name + ".pdf", "f").path)
             self.publish_message("written histogram for variable {}".format(variable.name))
 
-        output = self.output()
-        output.parent.touch()
-        output.dump(tmp)
+        with self.output().localize("w") as tmp:
+            tmp.dump(tmp_dir)
