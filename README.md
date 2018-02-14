@@ -1,4 +1,4 @@
-# SingleTop Analysis with Public CMS Data using luigi analysis workflows
+# SingleTop Analysis with Public CMS Data using *law*
 
 **Note**: This example is still under development. Apologies for missing documentation at some places.
 
@@ -18,7 +18,7 @@ To get familiar with law, please see these simple examples:
 The tasks in this example analysis require docker to be installed on your system. Other dependencies can be conveniently installed via
 
 ```bash
-> ./devinstall.sh
+$ ./devinstall.sh
 ```
 
 This will create a directory `devsoftware` at the top level directory with all required python packages ([luigi](https://github.com/spotify/luigi), [six](https://github.com/benjaminp/six), [scinum](https://github.com/riga/scinum), [law](https://github.com/riga/law), and [order](https://github.com/riga/order)).
@@ -29,19 +29,19 @@ This will create a directory `devsoftware` at the top level directory with all r
 Source the `devsoftware`:
 
 ```bash
-> source devenv.sh
+$ source devenv.sh
 ```
 
 Setup a few environment variables used by the singletop analysis:
 
 ```bash
-> source singletop.sh
+$ source singletop.sh
 ```
 
-If you want to see the tasks' dependency trees and progress live in your browser, open a second shell, source the `devenv.sh` script and start a central luigi scheduler:
+If you want to see the tasks' dependency tree and progress live in your browser, open a second shell, source the `devenv.sh` script and start a central luigi scheduler:
 
 ```bash
-> luigid
+$ luigid
 ```
 
 If you decided to use the central scheduler, you can omit the `--local-scheduler` parameters in all commands below.
@@ -51,37 +51,33 @@ Now you're good to go.
 
 ### Running the Analysis
 
-The analysis configuration is placed in [analysis/framework](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/framework) (too big a word for what it actually contains). It contains generic plotting methods, implementation of selection, reconstruction and systematics. Selection and reconstruction are not designed to be very performant - their purpose is to show event-by-event processing within law tasks. Although they are backed by numpy arrays, the processing is not numpy-vectorized for the sake of using TLorentzVector's.
+The analysis configuration is placed in [analysis/framework](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/framework) (too big a word for what it actually contains). It contains a stack plotting method, and the implementation of selection, reconstruction and systematics. Those are not designed to be very performant - their purpose is to show event-by-event processing within law tasks. Although backed by numpy arrays, the processing is not numpy-vectorized for the sake of using TLorentzVector's.
 
-The [analysis/setup](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/setup) directory contains the definition of input datasets, physics processes and constants, cross sections, and generic analysis information using order package.
+The [analysis/setup](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/setup) directory contains the definition of input datasets, physics processes and constants, cross sections, and generic analysis information using the order package. Especially processes and datasets could be candidates for public provisioning of LHC experiment data.
 
-The actual analysis is defined in [analysis/tasks/simple.py](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/tasks/simple.py). The tasks in this file rely on some base tasks (`AnalysisTask`, `ConfigTask`, `ShiftTask`, and `DatasetTask`, see [analysis/framework/tasks.py](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/framework/tasks.py)), which are defined along the major objects provided by order.
+The actual analysis is defined in [analysis/tasks/simple.py](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/tasks/simple.py). The tasks in this file rely on some base classes (`AnalysisTask`, `ConfigTask`, `ShiftTask`, and `DatasetTask`, see [analysis/framework/tasks.py](https://github.com/riga/law_example_CMSSingleTopAnalysis/blob/master/analysis/framework/tasks.py)), which are defined along the major objects provided by order.
 
 Let law scan your the tasks and their parameters:
 
 ```bash
-> law db
-```
+$ law db
 
-You should see this output:
-
-```
 loading tasks from 1 module(s)
 written 5 task(s) to db file '/law_example_CMSSingleTopAnalysis/.law/db'
 ```
 
-The created file is only used for faster auto-completion of your tasks (e.g. try `law run <tab><tab>`).
+The created file is only used for faster auto-completion of your tasks (e.g. try `law run <tab><tab>`), and for finding the correct model to load based on the *task family* you want to run. In general, law could also work without the *db* file, but it's very convenient.
 
 Now, fetch the CMS Open Data file containing singletop events:
 
 ```bash
-> law run singletop.FetchData --version v1 --dataset singleTop --local-scheduler
+$ law run singletop.FetchData --version v1 --dataset singleTop --local-scheduler
 ```
 
 Check that the task output exists:
 
 ```bash
-> law run singletop.FetchData --version v1 --dataset singleTop --print-status 0
+$ law run singletop.FetchData --version v1 --dataset singleTop --print-status 0
 
 print task status with max_depth 0 and target_depth 0
 
@@ -90,12 +86,12 @@ print task status with max_depth 0 and target_depth 0
 |     -> existent
 ```
 
-The file exists. The path of the `LocalFileTarget` is quite long, which is not law-specific but rather subject to the base task classes in this example. However, in reality, one shouldn't care too much about the exact paths, as long as task parameters are encoded consistently.
+The file exists. The path of the `LocalFileTarget` is quite long, which is not particularly law-specific but rather subject to the base task classes in this example. However, in reality, one shouldn't care too much about the exact paths, as long as task parameters are encoded consistently.
 
 Try to delete the output again:
 
 ```bash
-> law run singletop.FetchData --version v1 --dataset singleTop --remove-output 0
+$ law run singletop.FetchData --version v1 --dataset singleTop --remove-output 0
 
 remove task output with max_depth 0
 removal mode? [i*(interactive), a(all), d(dry)] # type 'a'
@@ -107,14 +103,14 @@ selected all mode
 |     removed
 ```
 
-(`--remove-output 0,a` would have get you to the same result, without the prompt)
+(`--remove-output 0,a` would have get you to the same result without the prompt)
 
 The number passed to both `--print-status` and `--remove-output` is the tree depth. 0 means the only the task itself, 1 means the first level of dependencies, etc, and negative numbers mean full recursion (handle with care).
 
 Now, you can run the selection and reconstruction. First, check the status of the task to get an idea of that the command will execute:
 
 ```bash
-> law run singletop.SelectAndReconstruct --version v1 --dataset singleTop --print-status -1
+$ law run singletop.SelectAndReconstruct --version v1 --dataset singleTop --print-status -1
 
 print task status with max_depth -1 and target_depth 0
 
@@ -131,22 +127,22 @@ print task status with max_depth -1 and target_depth 0
 |   |   |     -> absent
 ```
 
-Note that parameters such as `version` and `dataset` are passed from `SelectAndReconstruct` to `ConvertData` and `FetchData`. These kind of *soft information* can be set on task level with fine granularity.
+Note that parameters such as `version` and `dataset` are passed from `SelectAndReconstruct` to `ConvertData` and `FetchData`. This kind of *soft information* can be set on task level with fine granularity.
 
-Let's run the tasks (**make sure that the docker daemon is running**):
+Let's run the tasks (**make sure the docker daemon is running**):
 
 ```bash
-> law run singletop.SelectAndReconstruct --version v1 --dataset singleTop --local-scheduler
+$ law run singletop.SelectAndReconstruct --version v1 --dataset singleTop --local-scheduler
 ```
 
 It might take a few moments for the tasks to start, because a docker image is downloaded in the background which is required by two of the three tasks. You can transparently use, update, or remove that image afterwards.
 
-The two tasks use additional software (numpy and ROOT) which weren't installed in the setup section above. However, they make use of law's sandboxing mechanism which builds up the tree in the current environment, but forwards parts of its execution (i.e., the tasks' `run` methods) to different environments. Currently, law supports docker and singularity containers, as well as plain subshells with init files (e.g. for sourcing special software (CMSSW...) and setting variables).
+The two tasks use additional software (numpy and ROOT) which wasn't installed in the setup section above. However, they make use of law's sandboxing mechanism which builds up the tree in the current environment, but forwards parts of its execution (i.e., the tasks' `run` methods) to different environments. Currently, law supports docker and singularity containers, as well as plain subshells with custom init files (e.g. for sourcing special software (CMSSW...) and setting variables).
 
-Once the tasks are done, you can run the full analysis to obtain some result plots.
+Once the tasks are done, you can run the full analysis to obtain the result plots.
 
 ```bash
-> law run singletop.CreateHistograms --version v1 --local-scheduler
+$ law run singletop.CreateHistograms --version v1 --local-scheduler
 ```
 
 Feel free to check the status again before the actual task processing.
