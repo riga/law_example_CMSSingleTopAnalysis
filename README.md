@@ -2,12 +2,12 @@
 
 **Note**: This example is still under development. Apologies for missing documentation at some places.
 
-This example analysis uses CMS Open Data (2011) to perform a very simplified singletop analysis. It is desined to showcase the [luigi analysis workflow](https://github.com/riga/law) (law) package.
+This example analysis uses CMS Open Data (2011) to perform a very simple singletop analysis. It is desined to showcase the [luigi analysis workflow](https://github.com/riga/law) (law) package.
 
 
 ### Getting started
 
-To get familiar with law, please see these simple examples:
+To get familiar with law, have a look at these simple examples:
 
 - [loremipsum](https://github.com/riga/law/tree/master/examples/loremipsum) (measuring character frequencies)
 - [lsf_at_cern](https://github.com/riga/law/tree/master/examples/lsf_at_cern) (workflows that submit tasks via LSF)
