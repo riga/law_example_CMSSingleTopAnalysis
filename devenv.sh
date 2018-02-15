@@ -12,29 +12,20 @@ action() {
         [ ! -z "$1" ] && export PATH="$1:$PATH"
     }
 
-    # source dev software
+    # check dev software
     export LAW_DEV_SOFTWARE="$base/devsoftware"
-    if [ -d "$LAW_DEV_SOFTWARE" ]; then
-        # luigi
-        _addpy "$LAW_DEV_SOFTWARE/luigi"
-        _addbin "$LAW_DEV_SOFTWARE/luigi/bin"
-
-        # six
-        _addpy "$LAW_DEV_SOFTWARE/six"
-
-        # scinum
-        _addpy "$LAW_DEV_SOFTWARE/scinum"
-
-        # order
-        _addpy "$LAW_DEV_SOFTWARE/order"
-
-        # law
-        _addpy "$LAW_DEV_SOFTWARE/law"
-        _addbin "$LAW_DEV_SOFTWARE/law/bin"
-        source "$( law completion )"
+    if [ ! -d "$LAW_DEV_SOFTWARE" ]; then
+        echo "please run ./devinstall.sh run install required python packages"
+        return
+    else
+        _addbin "$LAW_DEV_SOFTWARE/bin"
+        _addpy "$LAW_DEV_SOFTWARE/lib/python2.7/site-packages"
     fi
 
     # add _this_ repo
     _addpy "$base"
+
+    # source the law auto-completion script
+    source "$( law completion )"
 }
 action "$@"

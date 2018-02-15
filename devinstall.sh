@@ -5,39 +5,15 @@ action() {
 
     local sw_base="$base/devsoftware"
     echo "installing development software in $sw_base"
-    mkdir -p "$sw_base"
 
-    _install_git() {
-        local name="$1"
-        local url="$2"
-        local tag="$3"
-        if [ ! -d "$sw_base/$name" ]; then
-            ( cd "$sw_base" && git clone "$url" )
-            if [ "$?" != "0" ]; then
-                2>&1 echo "$name checkout failed"
-                return "1"
-            fi
-            if [ ! -z "$tag" ]; then
-                ( cd "$sw_base/$name" && git checkout "tags/$tag" )
-            fi
-        else
-            echo "skipping $name, already exists"
-        fi
+    _install_pip() {
+        pip install --ignore-installed --prefix "$sw_base" "$1"
     }
 
-    # luigi
-    _install_git "luigi" "https://github.com/spotify/luigi.git" "2.7.2" || return "$?"
-
-    # six
-    _install_git "six" "https://github.com/benjaminp/six.git" "1.11.0" || return "$?"
-
-    # scinum
-    _install_git "scinum" "https://github.com/riga/scinum.git" || return "$?"
-
-    # order
-    _install_git "order" "https://github.com/riga/order.git" || return "$?"
-
-    # law
-    _install_git "law" "https://github.com/riga/law.git" || return "$?"
+    _install_pip luigi
+    _install_pip six
+    _install_pip scinum
+    _install_pip order
+    _install_pip law
 }
 action "$@"
