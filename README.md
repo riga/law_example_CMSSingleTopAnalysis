@@ -1,8 +1,11 @@
+![law](https://raw.githubusercontent.com/riga/law/master/logo.png)
+
 # SingleTop Analysis with Public CMS Data using *law*
 
 **Note**: This example is still under development. Apologies for missing documentation at some places.
 
-This example analysis uses CMS Open Data (2011) to perform a very simple singletop analysis. It is desined to showcase the [luigi analysis workflow](https://github.com/riga/law) (law) package.
+
+This example analysis uses CMS Open Data (2011) to perform a very simple singletop analysis. It is desined to showcase the [**luigi analysis workflow**](https://github.com/riga/law) (law) package.
 
 
 ### Getting started
