@@ -14,6 +14,7 @@ concurrency during task processing. For a more simple, straight-forward task cha
 from collections import OrderedDict
 
 import law
+import law.contrib.root
 import six
 
 from analysis.framework.tasks import ConfigTask, DatasetTask
