@@ -14,6 +14,7 @@ action() {
     _install_pip six
     _install_pip scinum
     _install_pip order
-    _install_pip law
+    # _install_pip law
+    _install_pip git+https://github.com/riga/law.git
 }
 action "$@"

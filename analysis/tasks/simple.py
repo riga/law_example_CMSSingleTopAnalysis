@@ -12,7 +12,8 @@ chain, see branched.py.
 from collections import OrderedDict
 
 import law
-import law.contrib.root
+law.contrib.load("numpy", "root")
+
 import six
 
 from analysis.framework.tasks import ConfigTask, DatasetTask

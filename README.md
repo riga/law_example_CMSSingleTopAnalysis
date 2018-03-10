@@ -150,6 +150,10 @@ $ law run singletop.CreateHistograms --version v1 --local-scheduler
 
 Feel free to check the status again before the actual task processing.
 
+The task graph will look like this:
+
+![example graph](https://www.dropbox.com/s/9jjezagvyfpph9f/st_graph.png?raw=1)
+
 This might take a few minutes. If you want to use multiple CPU cores (say 4), add `--workers 4`. If you use the central scheduler and forgot to set the number of workers, you can conveniently adjust that number right from your browser.
 
 Finally, unpack the output archive and watch the histograms you created!
