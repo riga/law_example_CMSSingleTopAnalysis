@@ -19,7 +19,7 @@ action() {
         return
     else
         _addbin "$LAW_DEV_SOFTWARE/bin"
-        _addpy "$LAW_DEV_SOFTWARE/lib/python2.7/site-packages"
+        _addpy "$LAW_DEV_SOFTWARE/lib/$( python -c 'import sys; print("python{}.{}".format(*sys.version_info[0:2]))' )/site-packages"
     fi
 
     # add _this_ repo
