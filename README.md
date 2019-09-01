@@ -63,10 +63,10 @@ The actual analysis is defined in [analysis/tasks/simple.py](https://github.com/
 Let law scan your the tasks and their parameters:
 
 ```bash
-$ law db
+$ law index
 
 loading tasks from 1 module(s)
-written 5 task(s) to db file '/law_example_CMSSingleTopAnalysis/.law/db'
+written 5 task(s) to db file '/law_example_CMSSingleTopAnalysis/.law/index'
 ```
 
 The created file is only used for faster auto-completion of your tasks (e.g. try `law run <tab><tab>`), and for finding the correct model to load based on the *task family* you want to run. In general, law could also work without the *db* file, but it's very convenient.
