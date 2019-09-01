@@ -43,11 +43,11 @@ cfg.add_channel("mu", 1,
 )
 
 # add systematic shifts
-cfg.add_shift("nominal")
-cfg.add_shift("lumi_up",   type="rate",  label="Luminosity")
-cfg.add_shift("lumi_down", type="rate",  label="Luminosity")
-cfg.add_shift("jer_up",    type="shape", label="Jet energy resolution")
-cfg.add_shift("jer_down",  type="shape", label="Jet energy resolution")
+cfg.add_shift("nominal", 1)
+cfg.add_shift("lumi_up", 2,   type="rate",  label="Luminosity")
+cfg.add_shift("lumi_down", 3, type="rate",  label="Luminosity")
+cfg.add_shift("jer_up", 4,    type="shape", label="Jet energy resolution")
+cfg.add_shift("jer_down", 5,  type="shape", label="Jet energy resolution")
 
 # variables
 cfg.add_variable("jet1_pt",
