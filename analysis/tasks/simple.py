@@ -12,7 +12,7 @@ chain, see branched.py.
 from collections import OrderedDict
 
 import law
-law.contrib.load("numpy", "root")
+law.contrib.load("numpy", "root", "docker")
 
 import six
 
