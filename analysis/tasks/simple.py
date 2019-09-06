@@ -75,7 +75,7 @@ class VaryJER(DatasetTask):
 
     @law.decorator.log
     def run(self):
-        events = self.input().load()["events"]
+        events = self.input().load(allow_pickle=True)["events"]
 
         # vary jer in all events
         vary_jer(events, self.shift_inst.direction)
@@ -140,7 +140,7 @@ class CreateHistograms(ConfigTask):
         events = OrderedDict()
         for dataset, inp in self.input().items():
             process = list(dataset.processes.values())[0]
-            events[process] = inp.load()["events"]
+            events[process] = inp.load(allow_pickle=True)["events"]
             self.publish_message("loaded events for dataset {}".format(dataset.name))
 
         tmp_dir = law.LocalDirectoryTarget(is_tmp=True)
