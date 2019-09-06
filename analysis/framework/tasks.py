@@ -19,6 +19,7 @@ class AnalysisTask(law.SandboxTask):
     version = luigi.Parameter(description="task version, required")
 
     analysis = "singletop"
+    sandbox_user = False  # run as root in sandbox
 
     local_workflow_require_branches = True
     exclude_db = True

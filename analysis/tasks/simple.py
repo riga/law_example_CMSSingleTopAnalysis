@@ -100,7 +100,7 @@ class SelectAndReconstruct(DatasetTask):
 
     @law.decorator.log
     def run(self):
-        events = self.input().load()["events"]
+        events = self.input().load(allow_pickle=True)["events"]
 
         # selection
         callback = self.create_progress_callback(len(events), (0, 50))
