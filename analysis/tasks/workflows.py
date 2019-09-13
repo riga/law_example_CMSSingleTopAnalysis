@@ -14,7 +14,7 @@ concurrency during task processing. For a more simple, straight-forward task cha
 from collections import OrderedDict
 
 import law
-law.contrib.load("numpy", "root")
+law.contrib.load("numpy", "root", "docker")
 import six
 
 from analysis.framework.tasks import ConfigTask, DatasetTask
@@ -79,7 +79,7 @@ class MapData(DatasetTask, law.LocalWorkflow):
 
     @law.decorator.log
     def run(self):
-        events = self.input().load()["events"]
+        events = self.input().load(allow_pickle=True)["events"]
 
         # "map" events into chunks, use the numer of files stored in the dataset instance
         slices = partial_slices(events.shape[0], self.dataset_info_inst.n_files)
@@ -110,7 +110,7 @@ class VaryJER(DatasetTask, law.LocalWorkflow):
 
     @law.decorator.log
     def run(self):
-        events = self.input().load()["events"]
+        events = self.input().load(allow_pickle=True)["events"]
 
         # vary jer in all events
         vary_jer(events, self.shift_inst.direction)
@@ -139,7 +139,7 @@ class SelectAndReconstruct(DatasetTask, law.LocalWorkflow):
 
     @law.decorator.log
     def run(self):
-        events = self.input().load()["events"]
+        events = self.input().load(allow_pickle=True)["events"]
 
         # selection
         indexes, selected_objects = select(events)
@@ -175,7 +175,7 @@ class ReduceData(DatasetTask):
         # load input arrays per dataset and "reduce" them by concatenating
         events = None
         for inp in self.input()["collection"].targets.values():
-            chunk = inp.load()["events"]
+            chunk = inp.load(allow_pickle=True)["events"]
             events = np.concatenate([events, chunk]) if events is not None else chunk
 
         with self.output().localize("w") as tmp:
@@ -204,7 +204,7 @@ class CreateHistograms(ConfigTask):
         events = OrderedDict()
         for dataset, inp in self.input().items():
             process = list(dataset.processes.values())[0]
-            events[process] = inp.load()["events"]
+            events[process] = inp.load(allow_pickle=True)["events"]
             self.publish_message("loaded events for dataset {}".format(dataset.name))
 
         tmp_dir = law.LocalDirectoryTarget(is_tmp=True)
