@@ -5,10 +5,11 @@
 *.DS_Store
 *.pkl
 *.egg-info
-MANIFEST
+MANIFEST.in
 __pycache__
 dist
 build
 data
+tmp
 devsoftware
 .law
