@@ -5,7 +5,8 @@ LABEL name="law_example_singletop"
 LABEL version="0.0.6"
 
 # workdir
-WORKDIR /root/law_example
+WORKDIR /law_example
+RUN chmod a+rwX /law_example
 
 # basic environment variables
 ENV LAW_SANDBOX docker::riga/law_example_singletop
@@ -67,3 +68,4 @@ RUN pip install scikit-learn
 RUN pip install root_numpy
 RUN pip install scinum
 RUN pip install order
+RUN pip install flake8

@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 Base task classes that are used across the analysis.
 """
+
 
 __all__ = ["AnalysisTask", "ConfigTask", "ShiftTask", "DatasetTask"]
 
@@ -19,10 +20,8 @@ class AnalysisTask(law.SandboxTask):
     version = luigi.Parameter(description="task version, required")
 
     analysis = "singletop"
-    sandbox_user = False  # run as root in sandbox
 
     local_workflow_require_branches = True
-    exclude_db = True
 
     @classmethod
     def get_task_namespace(cls):
@@ -34,12 +33,9 @@ class AnalysisTask(law.SandboxTask):
         # store the analysis instance
         self.analysis_inst = od.Analysis.get_instance(self.analysis)
 
-        # other attributes
-        self.local_root = os.getenv("ANALYSIS_LOCAL_STORE")
-
     @property
     def store_parts(self):
-        return (self.analysis, self.__class__.__name__)
+        return (self.task_family,)
 
     @property
     def store_parts_opt(self):
@@ -50,7 +46,7 @@ class AnalysisTask(law.SandboxTask):
 
     @property
     def local_store(self):
-        parts = (self.local_root,) + self.store_parts + self.store_parts_opt
+        parts = (os.getenv("ANALYSIS_STORE"),) + self.store_parts + self.store_parts_opt
         return os.path.join(*parts)
 
     def local_path(self, *parts):
@@ -61,7 +57,7 @@ class AnalysisTask(law.SandboxTask):
 
     @property
     def remote_store(self):
-        parts = ("law_analysis",) + self.store_parts + self.store_parts_opt
+        parts = ("law_example_singletop",) + self.store_parts + self.store_parts_opt
         return os.path.join(*parts)
 
     def remote_path(self, *parts):
@@ -71,8 +67,6 @@ class AnalysisTask(law.SandboxTask):
 class ConfigTask(AnalysisTask):
 
     config = "singletop_opendata_2011"
-
-    exclude_db = True
 
     def __init__(self, *args, **kwargs):
         super(ConfigTask, self).__init__(*args, **kwargs)
@@ -94,8 +88,7 @@ class ShiftTask(ConfigTask):
 
     shifts = set()
 
-    exclude_db = True
-    exclude_params_db = {"effective_shift"}
+    exclude_params_index = {"effective_shift"}
     exclude_params_req = {"effective_shift"}
     exclude_params_sandbox = {"effective_shift"}
 
@@ -130,8 +123,6 @@ class DatasetTask(ShiftTask):
 
     dataset = luigi.Parameter(default="singleTop", description="the dataset name, default: "
         "singleTop")
-
-    exclude_db = True
 
     @classmethod
     def modify_param_values(cls, params):
@@ -172,5 +163,5 @@ class DatasetTask(ShiftTask):
         return parts
 
     def create_branch_map(self):
-        # trivial branch map: loop over file indexes
+        # trivial branch map: one branch per file
         return {i: i for i in range(self.dataset_info_inst.n_files)}

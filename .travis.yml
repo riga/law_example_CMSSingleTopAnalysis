@@ -1,0 +1,18 @@
+sudo: required
+
+dist: trusty
+
+language: python
+
+stages:
+  - lint
+
+jobs:
+  include:
+    - stage: lint
+      env:
+        - JOB=lint
+      install:
+        - docker pull riga/law_example_singletop
+      script:
+        - docker run -t --rm -v `pwd`:/repo -w /repo riga/law_example_singletop flake8 analysis

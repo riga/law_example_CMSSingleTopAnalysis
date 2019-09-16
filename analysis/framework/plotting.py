@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
-Plotting.
+Plotting functions.
 """
 
 
