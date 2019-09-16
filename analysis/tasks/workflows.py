@@ -23,7 +23,7 @@ from analysis.framework.selection import select_singletop as select
 from analysis.framework.reconstruction import reconstruct_singletop as reconstruct
 from analysis.framework.systematics import vary_jer
 from analysis.framework.plotting import stack_plot
-from analysis.framework.util import join_struct_arrays
+from analysis.framework.util import join_struct_arrays, partial_slices
 
 
 class FetchData(DatasetTask):
@@ -86,7 +86,7 @@ class MapData(DatasetTask, law.LocalWorkflow):
         events = self.input().load(allow_pickle=True, formatter="numpy")["events"]
 
         # "map" events into chunks, use the numer of files stored in the dataset instance
-        slices = law.util.partial_slices(events.shape[0], self.dataset_info_inst.n_files)
+        slices = partial_slices(events.shape[0], self.dataset_info_inst.n_files)
         start, end = slices[self.branch]
         chunk = events[start:end]
 

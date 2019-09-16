@@ -5,7 +5,7 @@ Common process definitions.
 """
 
 
-__all__=[
+__all__ = [
     "process_singleTop", "process_VJets", "process_WJets", "process_ZJets", "process_VVJets",
     "process_WWJets", "process_WZJets", "process_ZZJets",
 ]
