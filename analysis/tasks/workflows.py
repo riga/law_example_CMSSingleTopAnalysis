@@ -147,7 +147,7 @@ class SelectAndReconstruct(DatasetTask, law.LocalWorkflow):
     @law.decorator.safe_output
     def run(self):
         # load the events
-        events = self.input().load(allow_pickle=True, formatter="numoy")["events"]
+        events = self.input().load(allow_pickle=True, formatter="numpy")["events"]
 
         # selection
         callback = self.create_progress_callback(len(events), (0, 50))
@@ -202,7 +202,7 @@ class CreateHistograms(ConfigTask):
     def requires(self):
         reqs = OrderedDict()
         for dataset in self.config_inst.datasets:
-            reqs[dataset] = SelectAndReconstruct.req(self, dataset=dataset.name)
+            reqs[dataset] = ReduceData.req(self, dataset=dataset.name)
         return reqs
 
     def output(self):
