@@ -34,9 +34,10 @@ class FetchData(DatasetTask):
 
     @law.decorator.safe_output
     def run(self):
-        # fetch the input file and save it at the output location
-        src = self.dataset_info_inst.keys[0]
-        six.moves.urllib.request.urlretrieve(src, self.output().path)
+        # fetch the input file and save it
+        with self.localize_output("w") as output:
+            src = self.dataset_info_inst.keys[0]
+            six.moves.urllib.request.urlretrieve(src, output.path)
 
 
 class ConvertData(DatasetTask):
@@ -56,7 +57,8 @@ class ConvertData(DatasetTask):
         self.publish_message("converted {} events".format(len(events)))
 
         # dump the written events
-        self.output().dump(events=events, formatter="numpy")
+        with self.localize_output("w") as output:
+            output.dump(events=events, formatter="numpy")
 
 
 class VaryJER(DatasetTask):
@@ -80,7 +82,8 @@ class VaryJER(DatasetTask):
         vary_jer(events, self.shift_inst.direction)
 
         # dump events
-        self.output().dump(events=events, formatter="numpy")
+        with self.localize_output("w") as output:
+            output.dump(events=events, formatter="numpy")
 
 
 class SelectAndReconstruct(DatasetTask):
@@ -113,7 +116,8 @@ class SelectAndReconstruct(DatasetTask):
         events = join_struct_arrays(events, reco_data)
 
         # dump events
-        self.output().dump(events=events, formatter="numpy")
+        with self.localize_output("w") as output:
+            output.dump(events=events, formatter="numpy")
 
 
 class CreateHistograms(ConfigTask):
@@ -150,4 +154,5 @@ class CreateHistograms(ConfigTask):
             self.publish_message("written histogram for variable {}".format(variable.name))
 
         # save the output directory as an archive
-        self.output().dump(tmp_dir, formatter="tar")
+        with self.localize_output("w") as output:
+            output.dump(tmp_dir, formatter="tar")
