@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 Event selection.
@@ -8,7 +8,7 @@ Event selection.
 __all__ = ["select_singletop"]
 
 
-from analysis.framework.opendata import *
+from analysis.framework.opendata import load_met, load_electron, load_muon, load_jet
 
 
 def select_singletop(events, callback=None):

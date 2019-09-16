@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 Helpful utilities.
 """
 
 
-__all__ = ["join_struct_arrays", "iter_chunks", "round_base", "partial_slices"]
+__all__ = ["join_struct_arrays", "round_base", "partial_slices"]
 
-
-import types
 
 import six
 
@@ -24,35 +22,6 @@ def join_struct_arrays(*arrays):
             new_array[name] = a[name]
 
     return new_array
-
-def iter_chunks(l, size):
-    """
-    Returns a generator containing chunks of *size* of a list, integer or generator *l*. A *size*
-    smaller than 1 results in no chunking at all.
-    """
-    if isinstance(l, six.integer_types):
-        l = six.range(l)
-
-    if isinstance(l, types.GeneratorType):
-        if size < 1:
-            yield list(l)
-        else:
-            chunk = []
-            for elem in l:
-                if len(chunk) < size:
-                    chunk.append(elem)
-                else:
-                    yield chunk
-                    chunk = []
-            if chunk:
-                yield chunk
-
-    else:
-        if size < 1:
-            yield l
-        else:
-            for i in six.range(0, len(l), size):
-                yield l[i:i+size]
 
 
 def round_base(num, base=1):

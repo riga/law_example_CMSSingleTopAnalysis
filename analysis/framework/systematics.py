@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 Functions that apply systematic uncertainties.
@@ -8,9 +8,9 @@ Functions that apply systematic uncertainties.
 __all__ = ["vary_jer"]
 
 
-from random import gauss
+import random
 
-from analysis.framework.opendata import *
+from analysis.framework.opendata import load_jet, dump_particle
 
 
 def vary_jer(events, direction):
@@ -24,8 +24,8 @@ def vary_event_jer(event, direction):
 
         # shift and smear by 5%
         if direction == "up":
-            jet *= gauss(1.05, 0.05)
+            jet *= random.gauss(1.05, 0.05)
         elif direction == "down":
-            jet *= gauss(0.95, 0.05)
+            jet *= random.gauss(0.95, 0.05)
 
         dump_particle(event, i, jet, "Jet")

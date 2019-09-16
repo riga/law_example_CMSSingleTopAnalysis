@@ -1,14 +1,15 @@
 FROM centos:7
 
 # labels
-LABEL name="law_example_base"
-LABEL version="0.0.5"
+LABEL name="law_example_singletop"
+LABEL version="0.0.6"
 
-# workdor
-WORKDIR /root/law_example
+# workdir
+WORKDIR /law_example
+RUN chmod a+rwX /law_example
 
 # basic environment variables
-ENV LAW_SANDBOX docker::riga/law_example_base
+ENV LAW_SANDBOX docker::riga/law_example_singletop
 ENV PATH /usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
 ENV LIBPATH /usr/local/lib:$LIBPATH
@@ -36,19 +37,35 @@ RUN mkdir /software
 # gfal2 dropbox plugin
 RUN git clone https://github.com/cern-it-sdc-id/gfal2-dropbox.git && \
     cd gfal2-dropbox && \
-    mkdir build && cd build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr && make && make install && \
-    cd ../.. && rm -rf gfal2-dropbox
+    mkdir build && \
+    cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr && \
+    make && \
+    make install && \
+    cd ../.. && \
+    rm -rf gfal2-dropbox
 
 # root
 ENV ROOTSYS /software/root
 RUN cd /software && \
-    wget -nv https://root.cern.ch/download/root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
-    tar -xzf root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
-    rm root_v6.10.08.Linux-centos7-x86_64-gcc4.8.tar.gz && \
+    wget -nv https://root.cern.ch/download/root_v6.18.04.Linux-centos7-x86_64-gcc4.8.tar.gz && \
+    tar -xzf root_v6.18.04.Linux-centos7-x86_64-gcc4.8.tar.gz && \
+    rm root_v6.18.04.Linux-centos7-x86_64-gcc4.8.tar.gz && \
     echo "source \$ROOTSYS/bin/thisroot.sh" >> /etc/profile.d/software.sh
 
 # python packages
+RUN pip install --upgrade pip
 RUN pip install requests
 RUN pip install six
+RUN pip install enum34
 RUN pip install luigi
+RUN pip install numpy==1.16.5
+RUN pip install scipy==1.2.2
+RUN pip install matplotlib
+RUN pip install numexpr
+RUN pip install pandas
+RUN pip install scikit-learn
+RUN pip install root_numpy
+RUN pip install scinum
+RUN pip install order
+RUN pip install flake8

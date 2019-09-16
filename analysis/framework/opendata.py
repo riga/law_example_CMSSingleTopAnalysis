@@ -1,12 +1,14 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 Interface to the numpy-converted open data format.
 """
 
 
-__all__ = ["load_value", "dump_value", "load_particle", "dump_particle", "load_electron",
-           "load_muon", "load_met", "load_jet", "load_mc_lepton", "load_mc_neutrino"]
+__all__ = [
+    "load_value", "dump_value", "load_particle", "dump_particle", "load_electron", "load_muon",
+    "load_met", "load_jet", "load_mc_lepton", "load_mc_neutrino",
+]
 
 
 # lorentz vector attributes
@@ -15,6 +17,9 @@ _vector_attrs = ("_E", "_Px", "_Py", "_Pz")
 
 def make_particle(E, px, py, pz):
     import ROOT
+    ROOT.PyConfig.IgnoreCommandLineOptions = True
+    ROOT.gROOT.SetBatch()
+
     return ROOT.TLorentzVector(px, py, pz, E)
 
 

@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
-Plotting.
+Plotting functions.
 """
 
 
@@ -30,8 +30,8 @@ def stack_plot(events, variable, path, weight="EventWeight"):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_xlim(variable.x_min, variable.x_max)
-    ax.set_xlabel(variable.full_x_title())
-    ax.set_ylabel(variable.full_y_title())
+    ax.set_xlabel(variable.get_full_x_title())
+    ax.set_ylabel(variable.get_full_y_title())
     ax.tick_params("both", direction="in", top=True, right=True)
 
     ax.hist(values, variable.bin_edges, weights=weights if use_weight else None, histtype="step",

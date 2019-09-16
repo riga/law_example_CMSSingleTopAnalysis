@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 Event reconstruction and helpers.
@@ -9,8 +9,6 @@ __all__ = ["reconstruct_singletop"]
 
 
 import six
-
-from analysis.framework.opendata import *
 
 
 def reconstruct_singletop(events, selected_objects, callback=None):
