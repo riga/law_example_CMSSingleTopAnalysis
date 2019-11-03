@@ -183,7 +183,11 @@ In case you are using a central luigi scheduler to visualize dependency trees an
 
 The processing might take a few minutes.
 
-Finally, unpack the output archive and watch the histograms you created!
+Finally, unpack the output archive and watch the histograms you created. The transverse momentum distribution of the leading jet should look like this:
+
+![jet1 pt](https://www.dropbox.com/s/frt9uqy6cr7zvac/law_singletop_jet1_pt.pdf?raw=1)
+
+Feel free to add more histograms!
 
 
 ### Resources
