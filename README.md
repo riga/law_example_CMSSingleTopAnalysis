@@ -53,7 +53,7 @@ The [analysis/config](analysis/config) directory contains the definition of inpu
 The actual analysis is defined in [analysis/tasks/simple.py](analysis/tasks/simple.py). The tasks in this file rely on some base classes (`AnalysisTask`, `ConfigTask`, `ShiftTask`, and `DatasetTask`, see [analysis/framework/tasks.py](analysis/framework/tasks.py)), which are defined along the major objects provided by [order](https://github.com/riga/order).
 
 
-##### Step 0: Let law scan your the tasks and their parameters
+#### Step 0: Let law scan your the tasks and their parameters
 
 You **want** your analysis workflow tool to provide auto-completion for your tasks and their parameters, and so does law. For that purpose, law needs a (human-readable) *index* file, which is faster to *grep* than starting a python interpreter every time you hit `<tab>` to check matching values.
 
@@ -77,7 +77,7 @@ written 5 task(s) to index file '/law_example_CMSSingleTopAnalysis/.law/index'
 In general, law could also work without the *index* file, but it's very convenient to have it.
 
 
-##### Step 1: Fetch a CMS OpenData file
+#### Step 1: Fetch a CMS OpenData file
 
 ```shell
 law run singletop.FetchData --version v1 --dataset singleTop
@@ -99,10 +99,11 @@ From the status text of the previous command you see that the output file exists
 
 **Note**:
 
-  - The `--version` parameter is encoded into the output directory. This behavior can be controller per task. See the base task definitions in [analysis/framework/tasks.py](analysis/framework/tasks.py) for more info. These tasks are not defined by law itself, but are provided by this example as some kind of *minimal framework*.
-  - The value passed to the `--dataset` parameter is used by the `DatasetTask` base task (i.e. all tasks in this example that treat a particular dataset, see previous link) to match against a `order.Dataset` object defined in [analysis/config/opendata_2011.py](analysis/config/opendata_2011.py). This configuration file contains and describes all CMS OpenData files used in this example. It is actually independent of any analysis and could also be provided centrally. Click [here](https://github.com/riga/order) for more info on the `order` package, which can be used to - well order - analysis objects (categories, channels, processes, etc. ) and external data from LHC expriments.
+  - The `--version` parameter is encoded into the output directory. The exact behavior can be controller per task. See the base task definitions in [analysis/framework/tasks.py](analysis/framework/tasks.py) for more info. Those tasks are not shipped with law itself, but they are provided by this example as some kind of *minimal framework*.
+  - The value passed to the `--dataset` parameter is used by the `DatasetTask` base task (i.e. all tasks in this example that treat a particular dataset, see the previous link) to match against an `order.Dataset` object defined in [analysis/config/opendata_2011.py](analysis/config/opendata_2011.py). This configuration file contains and describes all CMS OpenData files used in this example. It is actually independent of any analysis and could also be provided centrally. Click [here](https://github.com/riga/order) for more info on the `order` package.
 
-##### Step 2: Exercise: Delete the output again
+
+#### Step 2: Exercise: Delete the output again
 
 ```shell
 > law run singletop.FetchData --version v1 --dataset singleTop --remove-output 0
@@ -123,7 +124,7 @@ The number passed to both `--print-status` and `--remove-output` is the tree dep
 When running output removal in interactive mode, you are asked for every single output target whether you want to remove it or not.
 
 
-##### Step 3: Check the workflow structure (up to selection and reconstruction)
+#### Step 3: Check the workflow structure (up to selection and reconstruction)
 
 First, check the status of the `SelectAndReconstruct` task to get an idea of that the command will execute:
 
@@ -147,7 +148,7 @@ check status of singletop.SelectAndReconstruct(version=v1, effective_shift=nomin
 Note that the values of the parameters `--version` and `--dataset` are passed from `SelectAndReconstruct` to `ConvertData` and `FetchData`. This kind of *soft information* can be set on task level with fine granularity. When defining requirements to other tasks with the same parameters, it makes sense to propagate them consistently **or** to explicitely use different values to suite you particular worklfow.
 
 
-##### Step 4: Run selection and reconstruction
+#### Step 4: Run selection and reconstruction
 
 For that, **make sure the docker daemon is running**. Then run:
 
@@ -162,7 +163,7 @@ The two tasks use additional software (numpy and ROOT) which wasn't installed in
 When the tasks succeed, look into the target directories to see their outputs. You can also run the above command extended by `--print-status -1` again.
 
 
-##### Step 5: Run the full analysis to get histograms
+#### Step 5: Run the full analysis to get histograms
 
 The tasks above fetched data, converted them to numpy arrays, and performed a basic selection and reconstruction for the `singleTop` dataset only.
 
