@@ -5,12 +5,8 @@ action() {
     # local variables
     #
 
-    if [ ! -z "$ZSH_VERSION" ]; then
-        local this_file="${(%):-%x}"
-    else
-        local this_file="${BASH_SOURCE[0]}"
-    fi
-    local base="$( cd "$( dirname "$this_file" )" && pwd )"
+    local this_file="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
+    local this_dir="$( cd "$( dirname "$this_file" )" && pwd )"
 
     local vpython="$( python -c "import sys; print('{0.major}.{0.minor}'.format(sys.version_info))" )"
 
@@ -19,12 +15,12 @@ action() {
     # global variables
     #
 
-    export ANALYSIS_BASE="$base"
+    export ANALYSIS_BASE="$this_dir"
     export ANALYSIS_STORE="$ANALYSIS_BASE/tmp/data"
     export ANALYSIS_SOFTWARE="$ANALYSIS_BASE/tmp/software"
 
     export PATH="$ANALYSIS_SOFTWARE/bin:$PATH"
-    export PYTHONPATH="$base:$ANALYSIS_SOFTWARE/lib/python${vpython}/site-packages:$PYTHONPATH"
+    export PYTHONPATH="$ANALYSIS_BASE:$ANALYSIS_SOFTWARE/lib/python${vpython}/site-packages:$PYTHONPATH"
 
 
     #
