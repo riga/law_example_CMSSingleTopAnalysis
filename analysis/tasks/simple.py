@@ -17,10 +17,6 @@ law.contrib.load("numpy", "root", "docker")
 
 import analysis.config.singletop  # noqa: F401
 from analysis.framework.tasks import ConfigTask, DatasetTask
-from analysis.framework.selection import select_singletop as select
-from analysis.framework.reconstruction import reconstruct_singletop as reconstruct
-from analysis.framework.systematics import vary_jer
-from analysis.framework.plotting import stack_plot
 from analysis.framework.util import join_struct_arrays
 
 
@@ -57,8 +53,7 @@ class ConvertData(DatasetTask):
         self.publish_message("converted {} events".format(len(events)))
 
         # dump the written events
-        with self.localize_output("w") as output:
-            output.dump(events=events, formatter="numpy")
+        self.output().dump(events=events, formatter="numpy")
 
 
 class VaryJER(DatasetTask):
@@ -79,11 +74,11 @@ class VaryJER(DatasetTask):
         events = self.input().load(allow_pickle=True, formatter="numpy")["events"]
 
         # vary jer in all events
+        from analysis.framework.systematics import vary_jer
         vary_jer(events, self.shift_inst.direction)
 
         # dump events
-        with self.localize_output("w") as output:
-            output.dump(events=events, formatter="numpy")
+        self.output().dump(events=events, formatter="numpy")
 
 
 class SelectAndReconstruct(DatasetTask):
@@ -104,20 +99,21 @@ class SelectAndReconstruct(DatasetTask):
         events = self.input().load(allow_pickle=True, formatter="numpy")["events"]
 
         # selection
+        from analysis.framework.selection import select_singletop
         callback = self.create_progress_callback(len(events), (0, 50))
-        indexes, selected_objects = select(events, callback=callback)
+        indexes, selected_objects = select_singletop(events, callback=callback)
         self.publish_message("selected {} out of {} events".format(len(indexes), len(events)))
         events = events[indexes]
 
         # reconstruction
+        from analysis.framework.reconstruction import reconstruct_singletop
         callback = self.create_progress_callback(len(events), (50, 100))
-        reco_data = reconstruct(events, selected_objects, callback=callback)
+        reco_data = reconstruct_singletop(events, selected_objects, callback=callback)
         self.publish_message("reconstructed {} variables".format(len(reco_data.dtype.names)))
         events = join_struct_arrays(events, reco_data)
 
         # dump events
-        with self.localize_output("w") as output:
-            output.dump(events=events, formatter="numpy")
+        self.output().dump(events=events, formatter="numpy")
 
 
 class CreateHistograms(ConfigTask):
@@ -149,10 +145,10 @@ class CreateHistograms(ConfigTask):
         tmp_dir.touch()
 
         # create plots
+        from analysis.framework.plotting import stack_plot
         for variable in self.config_inst.variables:
             stack_plot(events, variable, tmp_dir.child(variable.name + ".pdf", "f").path)
             self.publish_message("written histogram for variable {}".format(variable.name))
 
         # save the output directory as an archive
-        with self.localize_output("w") as output:
-            output.dump(tmp_dir, formatter="tar")
+        self.output().dump(tmp_dir, formatter="tar")

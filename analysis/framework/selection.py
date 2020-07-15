@@ -15,14 +15,12 @@ def select_singletop(events, callback=None):
     indexes = []
     objects = []
 
-    cb = callable(callback)
-
     for i, event in enumerate(events):
         objs = select_event_singletop(event)
         if objs:
             indexes.append(i)
             objects.append(objs)
-        if cb:
+        if callable(callback):
             callback(i)
 
     return indexes, objects

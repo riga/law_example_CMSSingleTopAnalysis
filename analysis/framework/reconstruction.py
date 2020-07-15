@@ -8,7 +8,7 @@ Event reconstruction and helpers.
 __all__ = ["reconstruct_singletop"]
 
 
-import six
+from six.moves import zip
 
 
 def reconstruct_singletop(events, selected_objects, callback=None):
@@ -18,11 +18,9 @@ def reconstruct_singletop(events, selected_objects, callback=None):
 
     reco_data = np.empty((len(events),), dtype=[(name, "<f4") for name in names])
 
-    cb = callable(callback)
-
-    for i, (event, objects, reco) in enumerate(six.moves.zip(events, selected_objects, reco_data)):
+    for i, (event, objects, reco) in enumerate(zip(events, selected_objects, reco_data)):
         reconstruct_event_singletop(event, objects, reco)
-        if cb:
+        if callable(callback):
             callback(i)
 
     return reco_data
